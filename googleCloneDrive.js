@@ -1,4 +1,4 @@
-let main = req => {
+let main = () => {
 	let id = ScriptApp.getScriptId(),
 		name = DriveApp.getFileById(id).getName(),
 		target = getFolderContents(null, true),
