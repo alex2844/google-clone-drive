@@ -40,19 +40,24 @@ let cloneTreeFiles = (id, target, orig) => {
 			continue;
 		if (!target[k])
 			target[k] = {
-				id: DriveApp.getFileById(orig[k].id).makeCopy(DriveApp.getFolderById(id)).getId(),
+				id: download(orig[k].id, id).getId(),
 				time: new Date().getTime()
 			};
 		else if (orig[k].time > target[k].time) {
 			DriveApp.getFileById(target[k].id).setTrashed(true);
 			target[k] = {
-				id: DriveApp.getFileById(orig[k].id).makeCopy(DriveApp.getFolderById(id)).getId(),
+				id: download(orig[k].id, id).getId(),
 				time: new Date().getTime()
 			};
 		}else if (target[k].children)
 			cloneTreeFiles(target[k].id, target[k].children, orig[k].children);
 	}
 	return target;
+}
+let download = (fileId, folderId) => {
+  return DriveApp.getFileById(fileId.replace(/(?:.*)\/d\/(.*)\/view(?:.*)/, '$1')).makeCopy(
+	  DriveApp.getFolderById((folderId || DriveApp.getFileById(ScriptApp.getScriptId()).getParents().next().getId()))
+  );
 }
 let getFolderContents = (folderId, no_child) => {
 	let contents = {},
@@ -77,3 +82,5 @@ let getFolderContents = (folderId, no_child) => {
 	return contents;
 }
 this.googleCloneDrive = main;
+this.googleCloneDrive.download = download;
+this.googleCloneDrive.getFolderContents = getFolderContents;
